@@ -1,1 +1,4 @@
+.idea
+.vdcode
 .env
+/vendor/

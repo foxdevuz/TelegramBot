@@ -1,0 +1,21 @@
+{
+    "name": "abdullajonov/telegram-bot",
+    "description": "Open Source Telegram Bot Library",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "abdullajonov.uz",
+            "email": "abdullajonovboburjon05@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "App\\": "App/",
+            "Database\\": "database/",
+            "Untitled\\": "Untitled/",
+            "Src\\": "src/"
+        }
+    }
+}
