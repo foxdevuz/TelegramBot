@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Functions;
+use JetBrains\PhpStorm\NoReturn;
+
+/** This class contains basic functions that can be used in anywhere */
 class Core
 {
     /**
@@ -36,5 +39,14 @@ class Core
     public static function html($text): array|string
     {
         return str_replace(['<','>'],['&#60;','&#62;'],$text);
+    }
+
+    /**
+     * @param $data
+     * @return void
+     */
+    #[NoReturn] public static function dd($data) : void
+    {
+        echo sprintf("<pre>%s</pre>", die(var_dump($data)));
     }
 }

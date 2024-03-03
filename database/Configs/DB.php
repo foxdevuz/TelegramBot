@@ -21,7 +21,7 @@ class DB extends Core
         $this->password = self::getEnvVariable("PASSWORD");
         $this->database = self::getEnvVariable("DATABASE_NAME");
 
-        $dsn = "mysql:host={$this->host};dbname={$this->database}";
+        $dsn = "mysql:host={$this->host};dbname={$this->database};charset=utf8mb4";
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -29,11 +29,9 @@ class DB extends Core
         ];
 
         try {
-            $this->pdo = new \PDO($dsn, $this->user, $this->password, $options);
+            $this->pdo = new PDO($dsn, $this->user, $this->password, $options);
         } catch (PDOException $e) {
-            // Log or handle the error appropriately
             error_log("Database connection error: " . $e->getMessage());
-            // Re-throw the exception to let the calling code handle it
             throw new PDOException("Failed to connect to the database.", (int)$e->getCode());
         }
     }
@@ -48,7 +46,7 @@ class DB extends Core
         try {
             $columns = implode(", ", array_keys($data));
             $values = ":" . implode(", :", array_keys($data));
-            $sql = "INSERT INTO $table ($columns) VALUES ($values)";
+            $sql = "INSERT INTO" . $table . " (" . $columns . ") VALUES (" . $values . ")";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($data);
             return $this->pdo->lastInsertId();
@@ -68,7 +66,7 @@ class DB extends Core
     public function get(string $table, int $id): mixed
     {
         try {
-            $sql = "SELECT * FROM $table WHERE id = ?";
+            $sql = "SELECT * FROM" . $table . " WHERE id = ?";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([$id]);
             return $stmt->fetch();
@@ -76,6 +74,23 @@ class DB extends Core
             // Log or handle the error appropriately
             error_log("Database get error: " . $e->getMessage());
             // Re-throw the exception to let the calling code handle it
+            throw new PDOException("Failed to retrieve data from the database.", (int)$e->getCode());
+        }
+    }
+
+    /**
+     * @param string $table
+     * @return array
+     */
+    public function getAll(string $table) : array
+    {
+        try {
+            $sql = "SELECT * FROM".$table;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            error_log("Database get error: " . $e->getMessage());
             throw new PDOException("Failed to retrieve data from the database.", (int)$e->getCode());
         }
     }
@@ -94,7 +109,7 @@ class DB extends Core
                 $set .= "$key = :$key, ";
             }
             $set = rtrim($set, ', ');
-            $sql = "UPDATE $table SET $set WHERE id = :id";
+            $sql = "UPDATE " . $table . " SET " . $set . " WHERE id = :id";
             $data['id'] = $id;
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($data);
@@ -115,7 +130,7 @@ class DB extends Core
     public function delete(string $table, int $id): int
     {
         try {
-            $sql = "DELETE FROM $table WHERE id = ?";
+            $sql = "DELETE FROM" . $table . " WHERE id = ?";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([$id]);
             return $stmt->rowCount();
@@ -126,6 +141,24 @@ class DB extends Core
             throw new PDOException("Failed to delete data from the database.", (int)$e->getCode());
         }
     }
+
+    /**
+     * @param $table
+     * @return bool
+     */
+    public function deleteAll($table) : bool
+    {
+        try {
+            $sql = "DELETE FROM" . $table;
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            error_log("Database delete error: " . $e->getMessage());
+            throw new PDOException("Failed to delete data from the database.", (int)$e->getCode());
+        }
+    }
+
     /**
      * Execute a simple SQL query without parameters
      *

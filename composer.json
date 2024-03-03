@@ -10,7 +10,8 @@
         }
     ],
     "require": {
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-readline": "*"
     },
     "autoload": {
         "psr-4": {

@@ -1,6 +1,5 @@
 <?php
 require "vendor/autoload.php";
-
 use App\Functions\Core;
 if (Core::getEnvVariable("APP_ENV") == "local") {
     ini_set('display_errors', 1);
